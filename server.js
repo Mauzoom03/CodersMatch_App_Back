@@ -10,7 +10,7 @@ const UserRoutes = require('./src/api/users/users.routes')
 connect();
 
 const dotenv = require('dotenv');
-const ProductRoutes = require("./src/api/products/products.routes.js");
+const ProjectRoutes = require("./src/api/projects/projects.routes.js");
 // Ejecutamos método para usar .env
 dotenv.config();
  
@@ -42,7 +42,7 @@ app.use(
 
 //Routes
 app.use('/api/users', UserRoutes)
-app.use('/api/products', ProductRoutes)
+app.use('/api/projects', ProjectRoutes)
 app.use("/public", express.static("public"));
 app.use("/api", (req, res, next) => "im alive");
 
