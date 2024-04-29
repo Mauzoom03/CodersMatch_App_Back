@@ -2,10 +2,10 @@ const nodemailer = require("nodemailer")
 const express = require("express");
 const cors = require("cors");
 // Método de config cloudinary
-const { configCloudinary } = require('./src/utils/cloudinary/config');
+const { configCloudinary } = require('./src/utils/cloudinary/config.js');
 const { connect } = require("./src/utils/db.js");
 
-const UserRoutes = require('./src/api/users/users.routes')
+const UserRoutes = require('./src/api/users/users.routes.js')
 
 connect();
 
