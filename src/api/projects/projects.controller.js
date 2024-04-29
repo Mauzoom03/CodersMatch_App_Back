@@ -1,5 +1,5 @@
 const Project = require('./projects.model');
-const User = require('../users/users.model');
+const User = require('../collaborator/collaborator.model');
 
 const getProjects = async (req, res, next) => {
     try {
@@ -15,64 +15,86 @@ const getProfileProjects = async (req, res, next) => {
 
     try {
         const user = await User.findById(userId);
-        res.status(200).json({message: 'Proyecto creado correctamente', data: user.projects});
+        res.status(200).json({message: 'Proyecto encontrado correctamente', data: user.projects});
     } catch (error) {
         return next(error);
     }
 };
 
-const addProject = async (req, res, next) => {
-    const userId = req.params;
-    const nameProject = req.body;
-
+const createProject = async (req, res) => {
     try {
-        const user = await User.findById(userId);
+        const newProject = new Project({
+            name: req.body.name,
+            collaborator: req.body.collaborator,
+            description: req.body.description,
+            likes: req.body.likes,
+            link: req.body.link,
+            designs: req.body.designs,
+            userId: req.body.userId,
+            technologies: req.body.technologies,
+            status: req.body.status,
+            user: req.body.user
+        });
+  
+        const createdProject = await newProject.save();
+        return res.status(200).json({ message: 'Proyecto creado correctamente', data: createdProject });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error del servidor', error: error.message });
+    }
+};
 
-        if (user) {
-            const newProject = new Project();
+// const createProject = async (req, res, next) => {
+//     const userId = req.params;
+//     const nameProject = req.body;
 
-            newProject.user = userId;
-            newProject.name = nameProject;
-            newProject.save();
+//     try {
+//         const user = await User.findById(userId);
 
-            res.status(200).json(user.newProject);
+//         if (user) {
+//             const newProject = new Project();
 
-        } else {
-            res.status(400).json({message: 'Usuario no encontrado'})
-        }
+//             newProject.user = userId;
+//             newProject.name = nameProject;
+//             newProject.save();
+
+//             res.status(200).json(user.newProject);
+
+//         } else {
+//             res.status(400).json({message: 'Usuario no encontrado'})
+//         }
         
-    } catch (error) {
-        return next(error);
-    }
-};
+//     } catch (error) {
+//         return next(error);
+//     }
+// };
 
-const renameProject = async (req, res, next) => {
-    const projectId = req.params;
-    const newName = req.body;
+// const renameProject = async (req, res, next) => {
+//     const projectId = req.params;
+//     const newName = req.body;
 
-    try {
-        if (!projectId) {
-            return res.status(404).json({message: 'ID del proyecto no encontrado'});
-        }
+//     try {
+//         if (!projectId) {
+//             return res.status(404).json({message: 'ID del proyecto no encontrado'});
+//         }
     
-        if (!newName) {
-            return res.status(404).json({message: 'Nuevo nombre no encontrado'});
-        }
+//         if (!newName) {
+//             return res.status(404).json({message: 'Nuevo nombre no encontrado'});
+//         }
     
-        const projectToRename = await Project.findById(projectId);
+//         const projectToRename = await Project.findById(projectId);
 
-        if (!projectToRename) {
-            return res.status(404).json({message: 'Proyecto no encontrado'});
-        }
+//         if (!projectToRename) {
+//             return res.status(404).json({message: 'Proyecto no encontrado'});
+//         }
 
-        projectToRename.name = newName;
-        projectToRename.save();
+//         projectToRename.name = newName;
+//         projectToRename.save();
 
-        res.status(200).json({message: 'Proyecto renombrado correctamente', data: projectId})
-    } catch (error) {
-        return next(error)
-    }
-}
+//         res.status(200).json({message: 'Proyecto renombrado correctamente', data: projectId})
+//     } catch (error) {
+//         return next(error)
+//     }
+// }
 
 const deleteProject = async (req, res, next) => {
     const projectId = req.params;
@@ -90,60 +112,37 @@ const deleteProject = async (req, res, next) => {
     }
 }
 
-const addDesignToProject = async (req, res, next) => {
-    const { projectId, designId } = req.params;
+const editProject = async (req, res, next) => {
+    const projectId = req.params.projectId; 
+    const { name, collaborator, description, link, technologies, status } = req.body; 
 
     try {
-        const design = await Design.findById(designId);
-        if (!design) {
-            return res.status(404).json({ message: 'Diseño no encontrado.' });
-        }
-
         const project = await Project.findById(projectId);
+
         if (!project) {
             return res.status(404).json({ message: 'Proyecto no encontrado.' });
         }
-
-        project.designs.addToSet(design);
-
-        await project.save();
-
-        res.status(200).json({ message: 'Diseño añadido correctamente al proyecto', data: designId });
-    } catch (error) {
-        return next(error);
-    }
-};
-
-const deleteDesignToProject = async (req, res, next) => {
-    const { projectId, designId } = req.params;
-
-    try {
-        const design = await Design.findById(designId);
-        if (!design) {
-            return res.status(404).json({ message: 'Diseño no encontrado.' });
-        }
-
-        const project = await Project.findById(projectId);
-        if (!project) {
-            return res.status(404).json({ message: 'Proyecto no encontrado.' });
-        }
-
-        project.designs.remove(design);
+        project.name = name;
+        project.collaborator = collaborator;
+        project.description = description;
+        project.link = link;
+        // project.userId = userId; hay que editar el userId?
+        project.technologies = technologies;
+        project.status = status;
 
         await project.save();
 
-        res.status(200).json({ message: 'Diseño eliminado correctamente al proyecto', data: designId });
+        res.status(200).json({ message: 'Proyecto editado correctamente', data: project });
     } catch (error) {
-        return next(error);
+
+        return res.status(500).json({ message: 'Ha ocurrido un error en el servidor' });
     }
-};
+}
 
 module.exports = {
     getProjects,
     getProfileProjects,
-    addProject,
-    renameProject,
+    createProject,
     deleteProject,
-    addDesignToProject,
-    deleteDesignToProject
+    editProject
 }
