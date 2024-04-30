@@ -1,5 +1,5 @@
 const Project = require('./projects.model');
-const User = require('../collaborator/collaborator.model');
+const User = require('../users/users.model');
 
 const getProjects = async (req, res, next) => {
     try {
@@ -29,7 +29,6 @@ const createProject = async (req, res) => {
             description: req.body.description,
             likes: req.body.likes,
             link: req.body.link,
-            designs: req.body.designs,
             userId: req.body.userId,
             technologies: req.body.technologies,
             status: req.body.status,

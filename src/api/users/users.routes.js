@@ -1,6 +1,7 @@
 const UserRoutes = require('express').Router();
 const { isAuth } = require('../../middlewares/auth.middleware');
-const { register, login, logout, confirm,  newPassword, isAdmin} = require('./users.controllers');
+const upload = require('../../middlewares/updateFile.middleware');
+const { register, login, logout, confirm,  newPassword, isAdmin, getOneUser, patchUser, getAllUsers, deleteUser} = require('./users.controllers');
 
 UserRoutes.post('/register', register);
 UserRoutes.post('/login', login);
